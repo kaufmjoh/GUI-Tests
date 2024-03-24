@@ -7,14 +7,15 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 import random
 
 
+WIDTH = 5
+HEIGHT = 7
 
 
 class ScatterPlotWindow(QMainWindow):
-    #def __init__(self, dataframe1, dataframe2, dataframe3): #Make this part generic, take a single dataframe, where 1 column is the scattegory
-    def __init__(self, dataframe): #Make this part generic, take a single dataframe, where 1 column is the scattegory
+    def __init__(self, dataframe): 
         super().__init__()
         self.setWindowTitle('Scatter Plot')
-        self.setGeometry(100, 100, 800, 600)
+        self.setGeometry(100, 100, 1600, 600)
         
 
 
@@ -35,7 +36,7 @@ class ScatterPlotWindow(QMainWindow):
         self.setCentralWidget(central_widget)
         layout = QVBoxLayout(central_widget)
         
-        self.canvas = PlotCanvas(self, width=5, height=4)
+        self.canvas = PlotCanvas(self, width=WIDTH, height=HEIGHT)
         layout.addWidget(self.canvas)
         
         self.slider_label = QLabel("Select Scatter Plot:")
@@ -47,18 +48,29 @@ class ScatterPlotWindow(QMainWindow):
         self.slider.setTickInterval(1)
         self.slider.setTickPosition(QSlider.TicksBelow)
         self.slider.valueChanged.connect(self.update_plot) #Call this function when the slider changes
-        layout.addWidget(self.slider)
         
-        self.plot_scatter(1)
+        
+        # Set stretch factor for slider_label to make it smaller
+        layout.addWidget(self.slider, stretch=1)
+        layout.setStretchFactor(self.slider_label, 0)
+
+
+        self.plot_scatter(1) #Default plot to graph
         
     #Plot the scatter plot using matplotlib
     def plot_scatter(self, index):
+
+        axs = self.canvas.figure.clf()
+
         ax = self.canvas.figure.add_subplot(111)
+
+
         df = self.dataframes[index - 1]
         ax.scatter(df['x'], df['y'])
         ax.set_xlabel('X')
         ax.set_ylabel('Y')
         ax.set_title(f'Scatter Plot {index}')
+
         self.canvas.draw()
     
     #Callback function
@@ -67,7 +79,7 @@ class ScatterPlotWindow(QMainWindow):
         self.plot_scatter(index)
 
 class PlotCanvas(FigureCanvas):
-    def __init__(self, parent=None, width=5, height=4, dpi=100):
+    def __init__(self, parent=None, width=WIDTH, height=HEIGHT, dpi=100):
         self.figure = plt.figure(figsize=(width, height), dpi=dpi)
         super().__init__(self.figure)
         self.setParent(parent)
@@ -80,13 +92,13 @@ if __name__ == '__main__':
     y = []
 
     #This many plots
-    for i in range(0, 180):
+    for i in range(0, 90):
 
         #This many x values
-        for j in range(0, 10000):
+        for j in range(0, 1000):
             c.append(i)
             x.append(j)
-            y.append(random.randint(1, 10000))
+            y.append(random.randint(1, 1000))
 
 
     df = pd.DataFrame( {'c':c, 'x':x, 'y':y} )
