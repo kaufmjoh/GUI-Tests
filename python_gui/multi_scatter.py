@@ -4,6 +4,10 @@ import matplotlib.pyplot as plt
 from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QSlider, QLabel
 from PyQt5.QtCore import Qt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+import random
+
+
+
 
 class ScatterPlotWindow(QMainWindow):
     #def __init__(self, dataframe1, dataframe2, dataframe3): #Make this part generic, take a single dataframe, where 1 column is the scattegory
@@ -21,7 +25,7 @@ class ScatterPlotWindow(QMainWindow):
         for name, group in grouped:
             self.dataframes[name] = group
 
-
+        self.numPlots = len(self.dataframes)
 
 
         self.setup_ui()
@@ -39,7 +43,7 @@ class ScatterPlotWindow(QMainWindow):
         
         self.slider = QSlider(Qt.Horizontal)
         self.slider.setMinimum(1)
-        self.slider.setMaximum(3)
+        self.slider.setMaximum(self.numPlots)
         self.slider.setTickInterval(1)
         self.slider.setTickPosition(QSlider.TicksBelow)
         self.slider.valueChanged.connect(self.update_plot) #Call this function when the slider changes
@@ -70,14 +74,25 @@ class PlotCanvas(FigureCanvas):
 
 if __name__ == '__main__':
     # Example DataFrames (replace these with your own dataframes)
-    data = {
-    'c': [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2],
-    'x': [1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5],
-    'y': [1, 2, 3, 4, 5, 5, 4, 3, 2, 1, 3, 4, 5, 1, 2]
-    }
 
-    df = pd.DataFrame(data)
+    c = []
+    x = []
+    y = []
+
+    #This many plots
+    for i in range(0, 180):
+
+        #This many x values
+        for j in range(0, 10000):
+            c.append(i)
+            x.append(j)
+            y.append(random.randint(1, 10000))
+
+
+    df = pd.DataFrame( {'c':c, 'x':x, 'y':y} )
     
+    print("Hardest part was generating the data")
+
     app = QApplication(sys.argv)
     window = ScatterPlotWindow(df)
     window.show()
