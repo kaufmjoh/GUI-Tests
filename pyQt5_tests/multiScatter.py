@@ -84,9 +84,8 @@ class PlotCanvas(FigureCanvas):
         super().__init__(self.figure)
         self.setParent(parent)
 
-if __name__ == '__main__':
-    # Example DataFrames (replace these with your own dataframes)
 
+def generatePlots():
     c = []
     x = []
     y = []
@@ -103,8 +102,11 @@ if __name__ == '__main__':
 
     df = pd.DataFrame( {'c':c, 'x':x, 'y':y} )
     
-    print("Hardest part was generating the data")
+    return df
 
+if __name__ == '__main__':
+
+    df = generatePlots()
     app = QApplication(sys.argv)
     window = ScatterPlotWindow(df)
     window.show()
