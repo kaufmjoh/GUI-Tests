@@ -1,7 +1,7 @@
 import sys
 import pandas as pd
 import matplotlib.pyplot as plt
-from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QSlider, QLabel, QPushButton
+from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QSlider, QLabel, QPushButton, QLineEdit, QHBoxLayout
 from PyQt5.QtCore import Qt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 import random
@@ -10,6 +10,12 @@ import random
 WIDTH = 5
 HEIGHT = 7
 
+
+class PlotCanvas(FigureCanvas):
+    def __init__(self, parent=None, width=WIDTH, height=HEIGHT, dpi=100):
+        self.figure = plt.figure(figsize=(width, height), dpi=dpi)
+        super().__init__(self.figure)
+        self.setParent(parent)
 
 class ScatterPlotWindow(QMainWindow):
     def __init__(self): 
@@ -20,26 +26,33 @@ class ScatterPlotWindow(QMainWindow):
         self.setup_ui()
         
     def setup_ui(self):
-        central_widget = QWidget()
-        self.setCentralWidget(central_widget)
-        self.layout = QVBoxLayout(central_widget)
-        
+        #Set up the central widget and the ui layout
+        centralWidget = QWidget()
+        self.setCentralWidget(centralWidget)
+        self.layout = QVBoxLayout(centralWidget)
+
         self.canvas = PlotCanvas(self, width=WIDTH, height=HEIGHT)
         self.layout.addWidget(self.canvas)
         
+        #This is the entry layout, which contrains the user input fields
+        self.entryLayout = QHBoxLayout()
+
         #Setup a button that when pressed will generate the plots
         self.button = QPushButton(self)
-        self.button.setFixedSize(150, 150)
+        self.button.setFixedSize(100, 25)
         self.buttonLabel = QLabel("Generate Plots", self.button)
         self.button.clicked.connect(self.generatePlots)
         self.button.clicked.connect(self.createSlider)
 
-        self.layout.addWidget(self.button, stretch=1)
+        self.entryLayout.addWidget(self.button, stretch=1)
 
         #Setup a text input field that allows the user to choose how many plots to plot
-        #self.text_entry = QLineEdit()
-        #self.label = QLabel("Entered text":)
+        self.textEntry = QLineEdit()
+        self.textEntryLabel = QLabel("Entered text")
+        self.entryLayout.addWidget(self.textEntry)
         
+        #Add the entryLayout to the main layout
+        self.layout.addLayout(self.entryLayout)
 
 
     #Plot the scatter plot using matplotlib
@@ -62,17 +75,25 @@ class ScatterPlotWindow(QMainWindow):
         index = self.slider.value()
         self.plot_scatter(index)
 
+    #Generate the scatter plots
     def generatePlots(self):
         c = []
         x = []
         y = []
 
-        print("Generating Plots") #Why does this not print until after the window is closed?
+        #print("Generating Plots") #Why does this not print until after the window is closed?
 
-        #This many plots
-        for i in range(0, 100):
+        userTextEntry = self.textEntry.text()
 
-            #This many x values
+        if userTextEntry == "":
+            numPlots = 1
+        else:
+            numPlots = int(userTextEntry)
+
+        #Generate numPlots number of plots
+        for i in range(0, numPlots):
+
+            #With these many (x, y) pairs
             for j in range(0, 1000):
                 c.append(i)
                 x.append(j)
@@ -90,6 +111,7 @@ class ScatterPlotWindow(QMainWindow):
 
         self.numPlots = len(self.dataframes)
         
+    #Create the slider element, which allows the user to select which plot to show
     def createSlider(self):
         self.slider_label = QLabel("Select Scatter Plot:")
         self.layout.addWidget(self.slider_label)
@@ -109,11 +131,7 @@ class ScatterPlotWindow(QMainWindow):
         self.plot_scatter(1) #Default plot to graph
 
 
-class PlotCanvas(FigureCanvas):
-    def __init__(self, parent=None, width=WIDTH, height=HEIGHT, dpi=100):
-        self.figure = plt.figure(figsize=(width, height), dpi=dpi)
-        super().__init__(self.figure)
-        self.setParent(parent)
+
 
 
 if __name__ == '__main__':
