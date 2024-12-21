@@ -117,7 +117,6 @@ class PlotCanvas(FigureCanvas):
 
 if __name__ == '__main__':
 
-    #df = generatePlots()
     app = QApplication(sys.argv)
     window = ScatterPlotWindow()
     window.show()
