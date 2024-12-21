@@ -23,7 +23,9 @@ class ScatterPlotWindow(QMainWindow):
         self.setWindowTitle('Scatter Plot')
         self.setGeometry(100, 100, 1600, 600)
         
+        self.sliderCreated = False
         self.setup_ui()
+
         
     def setup_ui(self):
         #Set up the central widget and the ui layout
@@ -113,21 +115,24 @@ class ScatterPlotWindow(QMainWindow):
         
     #Create the slider element, which allows the user to select which plot to show
     def createSlider(self):
-        self.slider_label = QLabel("Select Scatter Plot:")
-        self.layout.addWidget(self.slider_label)
-        
-        self.slider = QSlider(Qt.Horizontal)
+        if not self.sliderCreated:
+            self.slider_label = QLabel("Select Scatter Plot:")
+            self.layout.addWidget(self.slider_label)    
+            self.slider = QSlider(Qt.Horizontal)
+            self.slider.setTickPosition(QSlider.TicksBelow)
+            self.slider.valueChanged.connect(self.update_plot) #Call this function when the slider changes
+
+            # Set stretch factor for slider_label to make it smaller
+            self.layout.addWidget(self.slider, stretch=1)
+            self.layout.setStretchFactor(self.slider_label, 0)
+
+            self.sliderCreated = True
+    
         self.slider.setMinimum(1)
         self.slider.setMaximum(self.numPlots)
-        self.slider.setTickInterval(1)
-        self.slider.setTickPosition(QSlider.TicksBelow)
-        self.slider.valueChanged.connect(self.update_plot) #Call this function when the slider changes
+        self.slider.setTickInterval(1)      
         
-        
-        # Set stretch factor for slider_label to make it smaller
-        self.layout.addWidget(self.slider, stretch=1)
-        self.layout.setStretchFactor(self.slider_label, 0)
-        
+        self.slider.setValue(1)
         self.plot_scatter(1) #Default plot to graph
 
 
