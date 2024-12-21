@@ -32,17 +32,22 @@ class ScatterPlotWindow(QMainWindow):
         self.button.setFixedSize(150, 150)
         self.buttonLabel = QLabel("Generate Plots", self.button)
         self.button.clicked.connect(self.generatePlots)
+        self.button.clicked.connect(self.createSlider)
+
         self.layout.addWidget(self.button, stretch=1)
 
-
+        #Setup a text input field that allows the user to choose how many plots to plot
+        #self.text_entry = QLineEdit()
+        #self.label = QLabel("Entered text":)
         
+
+
     #Plot the scatter plot using matplotlib
     def plot_scatter(self, index):
 
-        axs = self.canvas.figure.clf()
+        self.canvas.figure.clf()
 
-        ax = self.canvas.figure.add_subplot(111)
-
+        ax = self.canvas.figure.add_subplot()
 
         df = self.dataframes[index - 1]
         ax.scatter(df['x'], df['y'])
@@ -52,7 +57,7 @@ class ScatterPlotWindow(QMainWindow):
 
         self.canvas.draw()
     
-    #Callback function
+    #Callback function that's called whenever the slider is updated
     def update_plot(self):
         index = self.slider.value()
         self.plot_scatter(index)
@@ -65,7 +70,7 @@ class ScatterPlotWindow(QMainWindow):
         print("Generating Plots") #Why does this not print until after the window is closed?
 
         #This many plots
-        for i in range(0, 90):
+        for i in range(0, 100):
 
             #This many x values
             for j in range(0, 1000):
@@ -85,7 +90,7 @@ class ScatterPlotWindow(QMainWindow):
 
         self.numPlots = len(self.dataframes)
         
-
+    def createSlider(self):
         self.slider_label = QLabel("Select Scatter Plot:")
         self.layout.addWidget(self.slider_label)
         
@@ -104,15 +109,11 @@ class ScatterPlotWindow(QMainWindow):
         self.plot_scatter(1) #Default plot to graph
 
 
-
-
 class PlotCanvas(FigureCanvas):
     def __init__(self, parent=None, width=WIDTH, height=HEIGHT, dpi=100):
         self.figure = plt.figure(figsize=(width, height), dpi=dpi)
         super().__init__(self.figure)
         self.setParent(parent)
-
-
 
 
 if __name__ == '__main__':
