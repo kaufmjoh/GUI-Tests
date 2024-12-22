@@ -11,7 +11,7 @@ class CombineCsvsWindow(QMainWindow):
         
         self.setup_ui()
 
-        
+    #Call the setup functions to setup the various layouts of the gui   
     def setup_ui(self):
         #Set up the central widget and the ui layout
         centralWidget = QWidget()
@@ -54,10 +54,22 @@ class CombineCsvsWindow(QMainWindow):
 
         self.centralLayout.addLayout(self.file2Layout)
 
-    #Setup the layout for where the results information will be stored
+    #Setup the layout for where the output / results information will be stored
     def setupResultsBox(self):
         self.resultsLayout = QVBoxLayout()
 
+        self.destinationFileName = QLabel("<Destination file name will appear here>")
+        self.resultsLayout.addWidget(self.destinationFileName)
+
+
+        #Button to allow the user to select the destination
+        self.button = QPushButton(self)
+        self.button.setFixedSize(200, 50)
+        self.buttonLabel = QLabel("Select destination", self.button)
+        self.button.clicked.connect(self.getDestinationFile)
+        self.resultsLayout.addWidget(self.button, stretch=1)
+
+        #When this button is pressed, it will run the combine csvs script
         self.button = QPushButton(self)
         self.button.setFixedSize(200, 50)
         self.buttonLabel = QLabel("Combine files", self.button)
@@ -84,16 +96,34 @@ class CombineCsvsWindow(QMainWindow):
             print("Selected file 2:", file_name)
             self.file2Name.setText(file_name)
 
+    def getDestinationFile(self):
+        print("SUS!")
+        dialog = QFileDialog(self)
+        dialog.setFileMode(QFileDialog.AnyFile)
+        dialog.setViewMode(QFileDialog.Detail)
+            
+        #dialog.setNameFilters(["Images (*.png *.xpm *.jpg)", "Text files (*.txt)", "All files (*)"])
+        dialog.setNameFilters(["CSV Files (*.csv)"])
+        if dialog.exec_():
+            fileName = dialog.selectedFiles()[0]
+            
+            if not fileName.endswith(".csv"): #Add .csv to user's file name
+                fileName += ".csv"
+            
+            self.destinationFileName.setText(fileName)
+            print("Selected fileName", fileName)
+        else:
+            print("Failure question mark!")
+
     #Call the script to combine the csvs
     def runCombinationScript(self):
-        print("Mistakes were made")
 
         batFileName = "combineCsvs.bat"
         cFileName = "combineCsvs.c"
         exeFileName = "combineCsvs.exe"
         inputFile1 = self.file1Name.text()
         inputFile2 = self.file2Name.text()
-        outputFile = "data/combo.csv"
+        outputFile = self.destinationFileName.text()
 
         cmd = batFileName + " " + cFileName + " " + exeFileName + " " + inputFile1 + " " + inputFile2 + " " + outputFile
 
