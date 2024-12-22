@@ -63,6 +63,9 @@ class CombineCsvsWindow(QMainWindow):
         self.button.setFixedSize(200, 50)
         self.buttonLabel = QLabel("Combine files", self.button)
         self.button.clicked.connect(self.runCombinationScript)
+        self.resultsLayout.addWidget(self.button, stretch=1)
+
+        self.centralLayout.addLayout(self.resultsLayout)
 
     #Open the dialog to get the first csv file
     def getFile1(self):
