@@ -1,8 +1,7 @@
 import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QLabel, QPushButton, QLineEdit, QHBoxLayout, QFileDialog
+import os
 
-WIDTH = 5
-HEIGHT = 7
 
 class CombineCsvsWindow(QMainWindow):
     def __init__(self): 
@@ -88,7 +87,7 @@ class CombineCsvsWindow(QMainWindow):
     #Call the script to combine the csvs
     def runCombinationScript(self):
         print("Mistakes were made")
-        #Do some more stuff
+        os.system("combineCsvs.bat combineCsvs.c combineCsvs.exe data/ints.csv data/chars.csv data/combo.csv")
 
 if __name__ == '__main__':
 
