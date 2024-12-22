@@ -87,7 +87,18 @@ class CombineCsvsWindow(QMainWindow):
     #Call the script to combine the csvs
     def runCombinationScript(self):
         print("Mistakes were made")
-        os.system("combineCsvs.bat combineCsvs.c combineCsvs.exe data/ints.csv data/chars.csv data/combo.csv")
+
+        batFileName = "combineCsvs.bat"
+        cFileName = "combineCsvs.c"
+        exeFileName = "combineCsvs.exe"
+        inputFile1 = self.file1Name.text()
+        inputFile2 = self.file2Name.text()
+        outputFile = "data/combo.csv"
+
+        cmd = batFileName + " " + cFileName + " " + exeFileName + " " + inputFile1 + " " + inputFile2 + " " + outputFile
+
+        os.system(cmd)
+        #os.system("combineCsvs.bat combineCsvs.c combineCsvs.exe data/ints.csv data/chars.csv data/combo.csv")
 
 if __name__ == '__main__':
 
