@@ -1,6 +1,10 @@
 import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QLabel, QPushButton, QLineEdit, QHBoxLayout, QFileDialog
 import os
+import pandas as pd
+import subprocess
+import time
+import threading
 
 
 class CombineCsvsWindow(QMainWindow):
@@ -9,6 +13,8 @@ class CombineCsvsWindow(QMainWindow):
         self.setWindowTitle('Scatter Plot')
         self.setGeometry(100, 100, 1600, 600)
         
+        self.progress = -1
+
         self.setup_ui()
 
     #Call the setup functions to setup the various layouts of the gui   
@@ -61,6 +67,10 @@ class CombineCsvsWindow(QMainWindow):
         self.destinationFileName = QLabel("<Destination file name will appear here>")
         self.resultsLayout.addWidget(self.destinationFileName)
 
+        #Text label showing highest index
+        self.progressDisplay = QLabel("<Progress report will appear here>")
+        self.resultsLayout.addWidget(self.progressDisplay)
+
 
         #Button to allow the user to select the destination
         self.button = QPushButton(self)
@@ -96,6 +106,7 @@ class CombineCsvsWindow(QMainWindow):
             print("Selected file 2:", file_name)
             self.file2Name.setText(file_name)
 
+    #Open the dialog for the user to enter csv destination
     def getDestinationFile(self):
         print("SUS!")
         dialog = QFileDialog(self)
@@ -127,8 +138,42 @@ class CombineCsvsWindow(QMainWindow):
 
         cmd = batFileName + " " + cFileName + " " + exeFileName + " " + inputFile1 + " " + inputFile2 + " " + outputFile
 
-        os.system(cmd)
+        #os.system(cmd)
         #os.system("combineCsvs.bat combineCsvs.c combineCsvs.exe data/ints.csv data/chars.csv data/combo.csv")
+
+        subprocess.Popen([batFileName, cFileName, exeFileName, inputFile1, inputFile2, outputFile])
+
+        thread = threading.Thread(target=self.getProgressReport)
+        thread.daemon = True
+        thread.start()
+        #self.getProgressReport()
+
+
+    def getProgressReport(self):
+        temp_max_index = 0
+
+        time.sleep(2)
+
+        while(self.progress != temp_max_index):
+
+            try:
+                #Open csv, store in PD data frame
+                df = pd.read_csv(self.destinationFileName.text(), names = ['index', 'col1', 'col2', 'col3'])
+
+                #Get the maximum value from the first column, store in temp
+                self.progress = temp_max_index
+                temp_max_index = df['index'].max()
+                
+                self.progressDisplay.setText(str(temp_max_index))
+                
+
+            except: #Error was likely file wasn't created yet
+                temp_max_index = -2
+                print("You jumped the gun")
+                self.progressDisplay.setText("You jumped the gun")
+    
+
+
 
 if __name__ == '__main__':
 

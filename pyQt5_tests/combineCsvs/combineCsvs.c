@@ -96,12 +96,15 @@ int main(int argc, char **argv)
 		printf("You must provide three file paths to perform csv combination! (file1, file2, and destination)\n");
 		return 0;
 	}
+	printf("Beginning C operations");
 
 	for(int i = 0; i < 25000; i++)
 	{
 
 		combineCsvs(argv[1], argv[2], argv[3], i);
 	}
+
+	printf("Finished C operations");
 
 	return 0;
 }
